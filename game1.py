@@ -3,6 +3,7 @@ import random
 import sys
 import time
 from pygame.locals import *
+import numpy as np
 
 pygame.init()
 
@@ -34,6 +35,7 @@ class Enemy(pygame.sprite.Sprite):
         self.vel = v
         self.image = pygame.image.load("mario2.png")
         self.rect = self.image.get_rect()
+        self.pixels = pygame.surfarray.array2d(self.image)
         self.rect.center = (SCREEN_WIDTH//2, 0)
 
     def accelerate(self,v):
@@ -46,26 +48,80 @@ class Enemy(pygame.sprite.Sprite):
             self.rect.center = (random.randint(self.rect.width//2,SCREEN_WIDTH-self.rect.width//2),-self.rect.height//2)
             self.vel = [0,0]
 
+    def incidence(self,p):
+        if p.collision(self) == 1:
+            xp=p.rect.center[0]
+            yp=p.rect.center[1]
+            xs=self.rect.center[0]
+            ys=self.rect.center[1]
+            
+            
+
+            #player-pixel-relative x-interval of intersection
+            rxp1 = max([p.rect.left,self.rect.left]) - p.rect.left
+            rxp2 = min([self.rect.right, p.rect.right]) - p.rect.left
+            #enemy(self)-pixel-relative x-interval of intersection
+            rxs1 = max([self.rect.left,p.rect.left]) - self.rect.left
+            rxs2 = min([p.rect.right,self.rect.right]) - self.rect.left
+
+            #player-pixel-relative y-interval of intersection
+            ryp1 = max([self.rect.top, p.rect.top]) - p.rect.top
+            ryp2 = min([p.rect.bottom, self.rect.bottom]) - p.rect.top
+            #enemy(self)-pixel-relative y-interval of intersection
+            rys1 = max([self.rect.top,p.rect.top]) - self.rect.top
+            rys2 = min([self.rect.bottom,p.rect.bottom]) - self.rect.top
+
+            #print(f'other intervals = {[[rxp1,rxp2],[ryp1,ryp2]]}, enemy intervals = {[[rxs1,rxs2],[rys1,rys2]]}')
+            
+
+            p_pixinter = p.pixels[rxp1:rxp2, ryp1:ryp2]
+            s_pixinter = self.pixels[rxs1:rxs2, rys1:rys2]
+
+            nrows = rxp2-rxp1
+            ncols = ryp2-ryp1
+            inc = np.zeros((nrows,ncols))
+
+            for i in range(nrows):
+                for j in range(ncols):
+                    if p_pixinter[i,j] != 0 or s_pixinter[i,j] != 0:
+                        inc[i,j] = 1
+
+            return inc
+
+
     def hit(self, p):
         if p.collision(self) == 1:
-            w=self.rect.center[0] - p.rect.center[0]
-            h=self.rect.center[1] - p.rect.center[1]
-            x=(self.rect.width + p.rect.width)/2
-            y=(self.rect.height + p.rect.height)/2
-
-            if w == 0:
-                push = abs(y/h)
-            elif h == 0:
-                push = abs(x/w)
-            else:
-                push=min([abs(x/w),abs(y/h)])
-
-            l=(p.rect.center[0] + push*w,  p.rect.center[1] + push*h)
-            self.rect.center = l
+            xp=p.rect.center[0]
+            yp=p.rect.center[1]
+            xs=self.rect.center[0]
+            ys=self.rect.center[1]
             
-            #velocity correction:
+            inc=self.incidence(p)
+
+            if inc.shape[0] < inc.shape[1]: #then push self out of player horizontally
+                B=inc.transpose()
+                ls=[sum(B[i]) for i in range(B.shape[0])]
+                l=max(ls)
+                c=list(self.rect.center)
+                if xs > xp:
+                    c[0]+=l
+                else:
+                    c[0]+=-l
+                self.rect.center = tuple(c)
+            else: #push self out of player veritcally      
+                ls=[sum(inc[i]) for i in range(inc.shape[0])]
+                l=max(ls)
+                c=list(self.rect.center)
+                if ys > yp:
+                    c[1]+=l
+                else:
+                    c[1]+=-l
+                self.rect.center = tuple(c)
+
             self.vel = [p.vx,p.vy]
 
+
+            #print(f'other pixels: \n{p_pixinter}\nenemy pixels: \n{self.pixels[0:53, 62:67]}')
             
 
     def draw(self, surface):
@@ -76,6 +132,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__() 
         self.image = pygame.image.load("mario2.png")
+        self.pixels = pygame.surfarray.array2d(self.image)
         self.rect = self.image.get_rect()
         self.rect.center = (SCREEN_WIDTH//2, 3*SCREEN_HEIGHT//4)
         self.health=100
@@ -137,6 +194,7 @@ class grass(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__() 
         self.image = pygame.image.load("grass.png")
+        self.pixels = pygame.surfarray.array2d(self.image)
         self.rect = self.image.get_rect()
         self.rect.center = (SCREEN_WIDTH/2,SCREEN_HEIGHT)
         self.vx = 0
@@ -183,30 +241,42 @@ g = grass()
 
 #game loop begins
 while True:
-    C.update()
+    if P1.health > 0:
+        C.update()
 
-    E1.move()
-    if P1.collision(E1) == 0 and g.collision(E1) ==0 :
-        E1.accelerate([0,5/60])
+        E1.move()
+
+        if P1.collision(E1) == 1:
+            P1.health+=-(E1.incidence(P1).sum()/1000)*((E1.vel[0]-P1.vx)**2 +(E1.vel[1]-P1.vy)**2)**0.5
+            E1.hit(P1)
+        if g.collision(E1) == 1:
+            E1.hit(g)
+        if g.collision(E1) + P1.collision(E1) == 0:
+            E1.accelerate([0,10/60])
+            
+        
+        P1.update()
+        
+        DISPLAYSURF.fill(BLUE)
+        g.draw(DISPLAYSURF)
+        P1.draw(DISPLAYSURF)
+        E1.draw(DISPLAYSURF)
+        
+        
+        
+
+        pygame.display.update()
+        FramePerSec.tick(FPS)
     else:
-        E1.hit(P1)
-        E1.hit(g)
-    
-    P1.update()
-    
-    DISPLAYSURF.fill(BLUE)
-    g.draw(DISPLAYSURF)
-    P1.draw(DISPLAYSURF)
-    E1.draw(DISPLAYSURF)
-    
-    
-    
-
-    pygame.display.update()
-    FramePerSec.tick(FPS)
+        if int(time.time()) % 2 == 0:
+            DISPLAYSURF.fill(BLACK)
+        else: 
+            DISPLAYSURF.fill(RED)
 
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
     pygame.display.update()
+
+

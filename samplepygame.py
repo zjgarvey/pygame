@@ -21,8 +21,8 @@ font = pygame.font.SysFont('calibri', 14)
 font1 = pygame.font.SysFont('calibri', 40)
  
 # Screen information
-SCREEN_WIDTH = 500
-SCREEN_HEIGHT = 500
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 800
  
 DISPLAYSURF = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 DISPLAYSURF.fill(GREEN)
@@ -32,7 +32,7 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self,v = [0,5]):
         super().__init__() 
         self.vel = v
-        self.image = pygame.image.load("mario2.png")
+        self.image = pygame.image.load("Ball7.png")
         self.rect = self.image.get_rect()
         if self.vel[0] == 0:
             self.rect.center = (random.randint(self.rect.width//2,SCREEN_WIDTH-self.rect.width//2),-self.rect.height//2) 
