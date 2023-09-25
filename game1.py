@@ -33,7 +33,7 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self,v = [0,0]):
         super().__init__() 
         self.vel = v
-        self.image = pygame.image.load("mario2.png")
+        self.image = pygame.image.load("sprites/mario2.png")
         self.rect = self.image.get_rect()
         self.pixels = pygame.surfarray.array2d(self.image)
         self.rect.center = (SCREEN_WIDTH//2, 0)
@@ -131,7 +131,7 @@ class Enemy(pygame.sprite.Sprite):
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__() 
-        self.image = pygame.image.load("mario2.png")
+        self.image = pygame.image.load("sprites/mario2.png")
         self.pixels = pygame.surfarray.array2d(self.image)
         self.rect = self.image.get_rect()
         self.rect.center = (SCREEN_WIDTH//2, 3*SCREEN_HEIGHT//4)
@@ -193,7 +193,7 @@ class grass(pygame.sprite.Sprite):
 
     def __init__(self):
         super().__init__() 
-        self.image = pygame.image.load("grass.png")
+        self.image = pygame.image.load("sprites/grass.png")
         self.pixels = pygame.surfarray.array2d(self.image)
         self.rect = self.image.get_rect()
         self.rect.center = (SCREEN_WIDTH/2,SCREEN_HEIGHT)

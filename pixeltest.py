@@ -7,7 +7,7 @@ import numpy as np
 
 pygame.init()
 
-image = pygame.image.load("Ball3.png")
+image = pygame.image.load("sprites/Ball3.png")
 rect = image.get_rect()
 pixels = pygame.surfarray.array2d(image)
 x1=int(input("Row start: "))

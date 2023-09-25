@@ -37,7 +37,7 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self,v = [0,0],m = 10):
         super().__init__() 
         #       image properties
-        self.image = pygame.image.load("weird1.png")
+        self.image = pygame.image.load("sprites/weird1.png")
         self.rect = self.image.get_rect()
         self.pixels = pygame.surfarray.array2d(self.image)
        
@@ -278,7 +278,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self,m = 10):
         super().__init__()
         #   image properties 
-        self.image = pygame.image.load("Ball7.png")
+        self.image = pygame.image.load("sprites/Ball7.png")
         self.pixels = pygame.surfarray.array2d(self.image)
         self.rect = self.image.get_rect()
 
