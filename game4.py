@@ -157,7 +157,6 @@ class Enemy(pygame.sprite.Sprite):
         return inc
 
 
-        
 
     def clipout(self, p, normal): #will clip two images apart in the shortest direction possible
         #declare position vectors
@@ -392,8 +391,8 @@ def normal2(inc,r):
     for i in range(inc.shape[0]):
         for j in range(inc.shape[1]):
             if inc0[i,j]==1:
-                n1=n1+lin(inc1,i,j,r)/s
-                n2=n2+lin(inc2,i,j,r)/s
+                n1=n1+lin(inc1,i,j,r)
+                n2=n2+lin(inc2,i,j,r)
     if n1.dot(n2)<0:
         N=n1-n2
     else:
