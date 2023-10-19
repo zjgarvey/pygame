@@ -12,11 +12,11 @@ mass2 = float(input("Mass 2: "))
 #import images to use in collision
 im_spec = str(input("Use alternative image files for collision? (Y/N)"))
 if im_spec in ['y','Y']:
-    im1 = st(input("Specify path to first image: "))
-    im2 = st(input("Specify path to second image: "))
+    im1 = str(input("Specify path to first image (e.g. sprites/Ball1.png): "))
+    im2 = str(input("Specify path to second image: "))
 else:
-    im1 = "sprites/weird1.png"
-    im2 = "sprites/Ball7.png"
+    im2 = "sprites/weird1.png"
+    im1 = "sprites/Ball7.png"
 
 #initialize pygame and set FPS
 pygame.init()
