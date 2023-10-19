@@ -15,8 +15,9 @@ if im_spec in ['y','Y']:
     im1 = str(input("Specify path to first image (e.g. sprites/Ball1.png): "))
     im2 = str(input("Specify path to second image: "))
 else:
-    im2 = "sprites/weird1.png"
     im1 = "sprites/Ball7.png"
+    im2 = "sprites/weird1.png"
+
 
 #initialize pygame and set FPS
 pygame.init()
@@ -49,7 +50,7 @@ class Enemy(pygame.sprite.Sprite):
 
         super().__init__() 
         #       image properties
-        self.image = pygame.image.load(im1)
+        self.image = pygame.image.load(im2)
         self.rect = self.image.get_rect()
         self.pixels = pygame.surfarray.array2d(self.image)
 
@@ -215,7 +216,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self,m = 10):
         super().__init__()
         #   image properties 
-        self.image = pygame.image.load(im2)
+        self.image = pygame.image.load(im1)
         self.pixels = pygame.surfarray.array2d(self.image)
         self.rect = self.image.get_rect()
 
